@@ -22,16 +22,18 @@ except ImportError:
     UserSecretsClient = None
 
 
-def require_env(name: str) -> str:
+def read_secret(name: str) -> str | None:
     value = os.environ.get(name)
     if value:
         return value
     if UserSecretsClient is not None:
-        value = UserSecretsClient().get_secret(name)
+        try:
+            value = UserSecretsClient().get_secret(name)
+        except Exception:
+            value = None
         if value:
             return value
-    raise RuntimeError(f"Missing required environment variable or Kaggle secret: {name}")
-    return value
+    return None
 
 
 def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
@@ -67,17 +69,18 @@ def sample_rows(
 
 def inspect_dataset(
     repo_id: str,
-    token: str,
+    token: str | None,
     max_rows: int,
     preferred_configs: Iterable[str] | None = None,
 ) -> dict[str, Any]:
-    api = HfApi(token=token)
+    api = HfApi(token=token) if token else HfApi()
     info = api.dataset_info(repo_id=repo_id, token=token)
     payload: dict[str, Any] = {
         "repo_id": repo_id,
         "gated": info.gated,
         "private": info.private,
         "downloads": info.downloads,
+        "hf_token_present": token is not None,
     }
 
     configs = get_dataset_config_names(path=repo_id, token=token)
@@ -108,7 +111,7 @@ def inspect_dataset(
 
 
 def main() -> None:
-    token = require_env("HF_TOKEN")
+    token = read_secret("HF_TOKEN")
     max_rows = int(os.environ.get("SMOKE_MAX_ROWS", "4"))
 
     report = {
