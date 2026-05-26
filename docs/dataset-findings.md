@@ -25,6 +25,11 @@ The cloud-to-cloud path is:
 3. Kaggle notebook writes checkpoints and evaluation samples back to Hugging Face and/or a
    Kaggle dataset.
 
+The repo now contains:
+
+- `kaggle/probe`: metadata-only Hugging Face access validation
+- `kaggle/train_smoke`: tiny row-level smoke run scaffold for Kaggle
+
 If you insist that the training datasets themselves must live on Kaggle before training, that is a
 separate mirroring step. It cannot be completed for Mbaza until the Hugging Face account is
 approved for gated access.

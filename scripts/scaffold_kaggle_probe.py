@@ -13,11 +13,21 @@ import os
 from datasets import get_dataset_config_names
 from huggingface_hub import HfApi
 
+try:
+    from kaggle_secrets import UserSecretsClient
+except ImportError:
+    UserSecretsClient = None
+
 
 def require_env(name: str) -> str:
     value = os.environ.get(name)
-    if not value:
-        raise RuntimeError(f"Missing required environment variable: {name}")
+    if value:
+        return value
+    if UserSecretsClient is not None:
+        value = UserSecretsClient().get_secret(name)
+        if value:
+            return value
+    raise RuntimeError(f"Missing required environment variable or Kaggle secret: {name}")
     return value
 
 

@@ -1,0 +1,15 @@
+{
+  "id": "igisubizoparfait/qora-tts-train-smoke",
+  "title": "Qora TTS Train Smoke",
+  "code_file": "train_smoke_hf_to_kaggle.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
