@@ -1,0 +1,20 @@
+datasets:
+  - name: mbaza_main
+    role: target
+    hf_repo_id: mbazaNLP/kinyarwanda-tts-dataset
+    kaggle_search:
+      - mbaza kinyarwanda tts
+      - kinyarwanda tts
+    notes: >
+      Primary Kinyarwanda target corpus. Access must be verified with the authenticated
+      Hugging Face account before any training plan is accepted.
+  - name: waxal_pool
+    role: transfer_pool
+    hf_repo_id: google/WaxalNLP
+    kaggle_search:
+      - WaxalNLP
+      - waxal tts
+      - african tts google
+    notes: >
+      Transfer-only candidate pool. Language configs must be discovered dynamically.
+      Do not hardcode training subsets until inspection confirms the available configs.
