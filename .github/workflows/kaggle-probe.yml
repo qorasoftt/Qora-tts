@@ -1,5 +1,5 @@
 name: Kaggle Probe
-# Trigger note: workflow updates should force a fresh probe run.
+# Trigger note: workflow updates should force a fresh probe run after Kaggle account changes.
 
 on:
   workflow_dispatch:

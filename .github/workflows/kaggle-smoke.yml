@@ -1,5 +1,5 @@
 name: Kaggle Smoke
-# Trigger note: workflow updates should force a fresh smoke run.
+# Trigger note: workflow updates should force a fresh smoke run after Kaggle account changes.
 
 on:
   workflow_dispatch:
