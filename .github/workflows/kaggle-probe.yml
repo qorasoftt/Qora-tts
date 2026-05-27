@@ -1,4 +1,5 @@
 name: Kaggle Probe
+# Trigger note: workflow updates should force a fresh probe run.
 
 on:
   workflow_dispatch:
