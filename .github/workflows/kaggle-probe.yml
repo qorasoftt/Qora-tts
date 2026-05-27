@@ -1,0 +1,70 @@
+name: Kaggle Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "kaggle/probe/**"
+      - "scripts/scaffold_kaggle_probe.py"
+      - "scripts/prepare_kaggle_kernel.py"
+      - "scripts/poll_kaggle_kernel.py"
+      - ".github/workflows/kaggle-probe.yml"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      KERNEL_SLUG: qora-tts-dataset-probe
+      KERNEL_TITLE: Qora TTS Dataset Probe
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install runtime dependencies
+        run: python -m pip install kaggle
+
+      - name: Validate required secrets
+        run: |
+          test -n "$KAGGLE_API_TOKEN"
+          test -n "$KAGGLE_USERNAME"
+
+      - name: Configure Kaggle auth
+        run: |
+          mkdir -p "$HOME/.kaggle"
+          printf "%s" "$KAGGLE_API_TOKEN" > "$HOME/.kaggle/access_token"
+          chmod 600 "$HOME/.kaggle/access_token"
+
+      - name: Rewrite kernel metadata
+        run: |
+          python scripts/prepare_kaggle_kernel.py \
+            --kernel-dir kaggle/probe \
+            --username "$KAGGLE_USERNAME" \
+            --slug "$KERNEL_SLUG" \
+            --title "$KERNEL_TITLE" \
+            --internet true \
+            --gpu false
+
+      - name: Push Kaggle kernel
+        run: kaggle kernels push -p kaggle/probe
+
+      - name: Poll Kaggle kernel
+        run: python scripts/poll_kaggle_kernel.py --kernel "$KAGGLE_USERNAME/$KERNEL_SLUG"
+
+      - name: Download Kaggle logs
+        if: always()
+        run: kaggle kernels output "$KAGGLE_USERNAME/$KERNEL_SLUG" -p artifacts/kaggle_probe_output || true
+
+      - name: Upload Kaggle artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kaggle-probe-output
+          path: artifacts/kaggle_probe_output
+          if-no-files-found: ignore

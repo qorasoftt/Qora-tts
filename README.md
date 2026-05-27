@@ -27,6 +27,7 @@ python -m pip install -e .[dev]
 python scripts/inspect_datasets.py --config configs/datasets.yaml
 python scripts/scaffold_kaggle_probe.py --output-dir kaggle/probe
 python scripts/scaffold_kaggle_smoke.py --output-dir kaggle/train_smoke
+python scripts/prepare_kaggle_kernel.py --kernel-dir kaggle/probe --username YOUR_KAGGLE_USER --slug qora-tts-dataset-probe --title "Qora TTS Dataset Probe"
 ruff check .
 mypy src
 pytest
@@ -43,6 +44,22 @@ pytest
 2. Push `kaggle/probe` and run it first.
 3. Push `kaggle/train_smoke` and run the smoke job second.
 4. Only after both pass do we add real training code.
+
+## GitHub Actions secrets
+
+Add these repository secrets before relying on automation:
+
+- `KAGGLE_API_TOKEN`
+- `KAGGLE_USERNAME`
+- `HF_TOKEN`
+
+The repo includes:
+
+- `.github/workflows/kaggle-probe.yml`
+- `.github/workflows/kaggle-smoke.yml`
+
+These workflows rewrite the kernel metadata for the target Kaggle account, push the kernels, poll
+their status, and upload kernel outputs back to GitHub Actions artifacts.
 
 ## Current repo
 
